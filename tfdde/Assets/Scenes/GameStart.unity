@@ -187,10 +187,10 @@ MonoBehaviour:
   SpawnChance: 0.6
   brickPrefabs:
   - {fileID: 114548538340785628, guid: 32c134c07f507984fb1570759621048d, type: 2}
-  - {fileID: 114905932144448624, guid: 0f729148a3fbccf4fb28d8640e664cd1, type: 2}
+  - {fileID: 114194137685853948, guid: b85bd1d990b4a0243a8e0d30296a69fc, type: 2}
   brickProbabilities:
-  - 0.1
   - 0.2
+  - 0.8
   addBallPrefab: {fileID: 114497422897288978, guid: 7b66bf0a6785a504aab5417e173e16d1,
     type: 2}
   addBombPrefab: {fileID: 114699606937089018, guid: bca08730231ecb94f892d4d8ca5809b3,
