@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using AppAdvisory.BallX;
+using Adorables.Ball;
 public class GameEnter : MonoBehaviour {
 	public GameManager game;
 	private string sceneid = "";
