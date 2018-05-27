@@ -431,6 +431,16 @@ Prefab:
       value: 
       objectReference: {fileID: 114143044506531850, guid: 928b86798bd5d0f4cbd0ac602d639e25,
         type: 2}
+    - target: {fileID: 114231062265820120, guid: 9582955475939274185633cca0e04472,
+        type: 2}
+      propertyPath: numberOfDots
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 114231062265820120, guid: 9582955475939274185633cca0e04472,
+        type: 2}
+      propertyPath: linerenderma
+      value: 
+      objectReference: {fileID: 2100000, guid: e068dad0663695c43996f477ab097f54, type: 2}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 9582955475939274185633cca0e04472, type: 2}
   m_IsPrefabParent: 0
@@ -963,7 +973,7 @@ BoxCollider2D:
   m_Enabled: 1
   m_Density: 1
   m_Material: {fileID: 0}
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}

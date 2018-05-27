@@ -31,6 +31,9 @@ namespace Adorables.Ball
 		[SerializeField]
 		private Color[] ballcolors;
 
+		[SerializeField]
+		private Material linerenderma;
+
 		private List<Transform> trajectoryDots;
 
 		private List<Ball> balls;
@@ -223,7 +226,7 @@ namespace Adorables.Ball
 					LineRenderObj.transform.position = base.transform.position;
 					lineRenderer = LineRenderObj.AddComponent<LineRenderer>();
 					//设置材质  
-					lineRenderer.material = new Material(Shader.Find("Particles/Additive"));
+					lineRenderer.material = linerenderma;
 					//设置颜色  
 					lineRenderer.SetColors(Color.red, Color.yellow);
 					//设置宽度  
