@@ -181,50 +181,100 @@ namespace Adorables.Ball
 
 		private void StartFiring(Vector3 startPos)
 		{
-			foreach (Transform current in this.trajectoryDots)
+			//foreach (Transform current in this.trajectoryDots)
+			//{
+			//	if (!(current != null))
+			//	{
+			//		break;
+			//	}
+			//	current.position = base.transform.position;
+			//	current.gameObject.SetActive(true);
+			//}
+			if (lineRenderer != null)
 			{
-				if (!(current != null))
-				{
-					break;
-				}
-				current.position = base.transform.position;
-				current.gameObject.SetActive(true);
+				lineRenderer.gameObject.SetActive(false);
 			}
 		}
-
+		private LineRenderer lineRenderer;
+		Vector3[] linerenderpos = new Vector3[3];
 		private void Fire(Vector3 movement)
 		{
 			movement = movement - base.transform.position;
 			movement = new Vector3(movement.x, movement.y, 0);
-			if (this.trajectoryDots != null)
+			Vector2 direction = movement;
+			UnityEngine.Debug.DrawRay(base.transform.position, direction);
+			RaycastHit2D hit = Physics2D.Raycast(base.transform.position, direction, 1000, 1 << 9);
+			//Vector2 hitpos = Vector2.zero;
+			Vector2 hitdirection = Vector2.Reflect(direction, hit.normal);
+			//if (hit.collider!=null && hit.collider.CompareTag(Constants.HITABLE_TAG))
+			//{
+			//	hitpos = hit.point;
+			//}
+
+			if (movement == Vector3.zero)
 			{
-				if (movement == Vector3.zero)
-				{
-					return;
-				}
-				if (movement != Vector3.zero)
-				{
-					this.SetTrajectoryPoints(base.transform.position, movement);
-				}
+				return;
 			}
-			else
+			if (movement != Vector3.zero)
 			{
-				UnityEngine.Debug.Log("No swipe");
+				if (lineRenderer == null)
+				{
+					GameObject LineRenderObj = new GameObject("linerender");
+					LineRenderObj.transform.position = base.transform.position;
+					lineRenderer = LineRenderObj.AddComponent<LineRenderer>();
+					//设置材质  
+					lineRenderer.material = new Material(Shader.Find("Particles/Additive"));
+					//设置颜色  
+					lineRenderer.SetColors(Color.red, Color.yellow);
+					//设置宽度  
+					lineRenderer.SetWidth(0.02f, 0.02f);
+					lineRenderer.positionCount = 3;
+					//lineRenderer.useWorldSpace = false;
+				}
+				else
+				{
+					lineRenderer.transform.position = base.transform.position;
+					lineRenderer.gameObject.SetActive(true);
+				}
+				linerenderpos[0] = base.transform.position;
+				linerenderpos[1] = new Vector3(hit.point.x, hit.point.y, 0);
+				Vector2 destpos = hit.point + hitdirection.normalized * 1f;
+				linerenderpos[2] = new Vector3(destpos.x, destpos.y, 0);
+				lineRenderer.SetPositions(linerenderpos);
 			}
+			//if (this.trajectoryDots != null)
+			//{
+			//	if (movement == Vector3.zero)
+			//	{
+			//		return;
+			//	}
+			//	if (movement != Vector3.zero)
+			//	{
+			//		this.SetTrajectoryPoints(base.transform.position, movement);
+			//	}
+			//}
+			//else
+			//{
+			//	UnityEngine.Debug.Log("No swipe");
+			//}
 		}
 
 		private void EndFiring(Vector3 movement)
 		{
+			if (lineRenderer != null)
+			{
+				lineRenderer.gameObject.SetActive(false);
+			}
 			movement = movement -base.transform.position;
 			movement = new Vector3(movement.x, movement.y, 0);
-			foreach (Transform current in this.trajectoryDots)
-			{
-				if (!(current != null))
-				{
-					return;
-				}
-				current.gameObject.SetActive(false);
-			}
+			//foreach (Transform current in this.trajectoryDots)
+			//{
+			//	if (!(current != null))
+			//	{
+			//		return;
+			//	}
+			//	current.gameObject.SetActive(false);
+			//}
 			if (Vector3.Angle(movement, Vector3.up) > 90f - this.offsetRotation)
 			{
 				return;
