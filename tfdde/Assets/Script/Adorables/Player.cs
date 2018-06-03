@@ -1,4 +1,5 @@
 using DG.Tweening;
+using SimplePool;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -34,9 +35,14 @@ namespace Adorables.Ball
 		[SerializeField]
 		private Material linerenderma;
 
-		private List<Transform> trajectoryDots;
+		[SerializeField]
+		private Transform ball_pos;
 
-		private List<Ball> balls;
+		private Pool<Ball> _balls_pool;
+
+		private int ballcount;
+
+		//private List<Ball> balls;
 
 		private int stopedBallsCount;
 
@@ -53,6 +59,8 @@ namespace Adorables.Ball
 		public int BAlleinGioco;
 
 		public int Zero;
+
+		private Vector3 nextplayerpos;
 
 		public Rect ScreenRect
 		{
@@ -82,8 +90,18 @@ namespace Adorables.Ball
 		{
 			get
 			{
-				return this.stopedBallsCount == this.balls.Count;
+				return this.stopedBallsCount == this.ballcount;
 			}
+		}
+
+		private void Awake()
+		{
+			_balls_pool = new Pool<Ball>();
+		}
+
+		private void OnDestroy()
+		{
+			_balls_pool.ClearUp();
 		}
 
 		public void FixedUpdate()
@@ -113,47 +131,69 @@ namespace Adorables.Ball
 
 		public void SetUpBalls()
 		{
-			this.balls = new List<Ball>();
-			this.AddBall();
+			//this.balls = new List<Ball>();
+			this.AddBall(500);
 		}
 
-		public void AddBall()
+		public void AddBall(int count)
 		{
-			Ball ball = UnityEngine.Object.Instantiate<Ball>(this.ballPrefab);
+			//Ball ball = this._balls_pool.GetObject().ball;
+			//this.balls.Add(ball);
+			this.ballcount += count;
+		}
+
+		public void InitBall(Ball ball)
+		{
 			ball.transform.position = base.transform.position;
 			ball.transform.localScale *= this.BallScale;
-			ball.gameObject.SetActive(false);
 			Ball expr_4B = ball;
 			expr_4B.HitFloor = (Action<Ball>)Delegate.Combine(expr_4B.HitFloor, new Action<Ball>(this.OnBallHitWall));
-			this.balls.Add(ball);
+			ball.DeathAction = (Action<Ball>)Delegate.Combine(expr_4B.DeathAction, new Action<Ball>(this.OnBallDeath));
 		}
 
-		private void OnBallHitWall(Ball ball)
+
+		private void OnBallDeath(Ball ball)
 		{
-			ball.gameObject.SetActive(false);
-			if (this.stopedBallsCount == 0)
-			{
-				base.transform.position = new Vector3(ball.transform.position.x, base.transform.position.y);
-				//this.DisplayPlayer(true);
-			}
-			ball.transform.position = base.transform.position;
+			this._balls_pool.DeleteObject(ball);
+			//ball.gameObject.SetActive(false);
 			this.stopedBallsCount++;
 			if (this.AllBallsStoped)
 			{
 				this.EndTurn();
 			}
 		}
+		private void OnBallHitWall(Ball ball)
+		{
+			nextplayerpos = new Vector3(ball.transform.position.x, base.transform.position.y);
+			if (!firsthit)
+			{
+				firsthit = true;
+				SetPlayerNextPos();
+			}
+		}
 
-		//private void MoveBallToPlayer(Ball ball)
-		//{
-		//	ball.transform.DOMove()
-		//}
+		private bool fireall = false;
+		private bool firsthit = false;
+		private void SetPlayerNextPos()
+		{
+			if(fireall && firsthit)
+			{
+				//base.transform.position = nextplayerpos;
+				PlayerMoveNextPos();
+			}
+		}
+
+		private void PlayerMoveNextPos()
+		{
+			base.transform.DOMove(nextplayerpos ,0.2f);
+		}
+
 
 		public void StartTurn()
 		{
 			this.SubscribeToInputManager();
 			this.DisplayNRemainingBalls(true);
-			this.SetNRemainingBalls(this.balls.Count);
+			this.SetNRemainingBalls(ballcount);
 			this.DisplayPlayer(true);
 			base.transform.position = new Vector3(Mathf.Clamp(base.transform.position.x, this.ScreenRect.xMin + base.transform.localScale.x, this.ScreenRect.xMax - base.transform.localScale.x), base.transform.position.y, 0f);
 		}
@@ -167,32 +207,8 @@ namespace Adorables.Ball
 			this.BAlleinGioco = 0;
 		}
 
-		public void SetUpTrajectoryDots()
-		{
-			this.trajectoryDots = new List<Transform>();
-			int num = 0;
-			while ((float)num < this.numberOfDots)
-			{
-				GameObject gameObject = UnityEngine.Object.Instantiate<GameObject>(this.dotPrefab);
-				gameObject.transform.localScale *= this.BallScale;
-				gameObject.transform.position = Vector3.zero;
-				gameObject.SetActive(false);
-				this.trajectoryDots.Add(gameObject.transform);
-				num++;
-			}
-		}
-
 		private void StartFiring(Vector3 startPos)
 		{
-			//foreach (Transform current in this.trajectoryDots)
-			//{
-			//	if (!(current != null))
-			//	{
-			//		break;
-			//	}
-			//	current.position = base.transform.position;
-			//	current.gameObject.SetActive(true);
-			//}
 			if (lineRenderer != null)
 			{
 				lineRenderer.gameObject.SetActive(false);
@@ -202,12 +218,14 @@ namespace Adorables.Ball
 		Vector3[] linerenderpos = new Vector3[3];
 		private void Fire(Vector3 movement)
 		{
-			movement = movement - base.transform.position;
+			movement = movement - this.GetBallPos();
 			movement = new Vector3(movement.x, movement.y, 0);
 			Vector2 direction = movement;
-			UnityEngine.Debug.DrawRay(base.transform.position, direction);
-			RaycastHit2D hit = Physics2D.Raycast(base.transform.position, direction, 1000, 1 << 9);
-			//Vector2 hitpos = Vector2.zero;
+			UnityEngine.Debug.DrawRay(this.GetBallPos(), direction);
+			RaycastHit2D hit = Physics2D.Raycast(this.GetBallPos(), direction, 1000, 1 << 9);
+			//Vector2 circle_origin = hit.point + (-direction * 0.1f);
+			//RaycastHit2D hitcircle = Physics2D.CircleCast(circle_origin, direction, 1000, 1 << 9);
+			
 			Vector2 hitdirection = Vector2.Reflect(direction, hit.normal);
 			//if (hit.collider!=null && hit.collider.CompareTag(Constants.HITABLE_TAG))
 			//{
@@ -223,7 +241,7 @@ namespace Adorables.Ball
 				if (lineRenderer == null)
 				{
 					GameObject LineRenderObj = new GameObject("linerender");
-					LineRenderObj.transform.position = base.transform.position;
+					LineRenderObj.transform.position = this.GetBallPos();
 					lineRenderer = LineRenderObj.AddComponent<LineRenderer>();
 					//ÉèÖÃ²ÄÖÊ  
 					lineRenderer.material = linerenderma;
@@ -236,53 +254,32 @@ namespace Adorables.Ball
 				}
 				else
 				{
-					lineRenderer.transform.position = base.transform.position;
+					lineRenderer.transform.position = this.GetBallPos();
 					lineRenderer.gameObject.SetActive(true);
 				}
-				linerenderpos[0] = base.transform.position;
+				linerenderpos[0] = this.GetBallPos();
 				linerenderpos[1] = new Vector3(hit.point.x, hit.point.y, 0);
 				Vector2 destpos = hit.point + hitdirection.normalized * 1f;
 				linerenderpos[2] = new Vector3(destpos.x, destpos.y, 0);
 				lineRenderer.SetPositions(linerenderpos);
 			}
-			//if (this.trajectoryDots != null)
-			//{
-			//	if (movement == Vector3.zero)
-			//	{
-			//		return;
-			//	}
-			//	if (movement != Vector3.zero)
-			//	{
-			//		this.SetTrajectoryPoints(base.transform.position, movement);
-			//	}
-			//}
-			//else
-			//{
-			//	UnityEngine.Debug.Log("No swipe");
-			//}
 		}
 
 		private void EndFiring(Vector3 movement)
 		{
+			firsthit = false;
+			fireall = false;
 			if (lineRenderer != null)
 			{
 				lineRenderer.gameObject.SetActive(false);
 			}
-			movement = movement -base.transform.position;
+			movement = movement -this.GetBallPos();
 			movement = new Vector3(movement.x, movement.y, 0);
-			//foreach (Transform current in this.trajectoryDots)
-			//{
-			//	if (!(current != null))
-			//	{
-			//		return;
-			//	}
-			//	current.gameObject.SetActive(false);
-			//}
 			if (Vector3.Angle(movement, Vector3.up) > 90f - this.offsetRotation)
 			{
 				return;
 			}
-			//Vector3 b = new Vector3(this.ScreenRect.xMin, base.transform.position.y, 0f);
+			Vector3 b = new Vector3(this.ScreenRect.xMin, base.transform.position.y, 0f);
 			//if (Vector3.Distance(base.transform.position, b) < base.transform.localScale.x + this.threshold && Vector3.Dot(movement, Vector3.right) < 0f)
 			//{
 			//	return;
@@ -305,12 +302,14 @@ namespace Adorables.Ball
 			int i;
 			Ball ball;
 
-			startPosition = this.transform.position;
+			startPosition = this.GetBallPos();
 			i = 0;
 			while (true)
 			{
-				if (i >= this.balls.Count)
+				if (i >= this.ballcount)
 				{
+					fireall = true;
+					SetPlayerNextPos();
 					yield return new WaitForSeconds(2f * this.SpawnFrequency);
 					this.DisplayNRemainingBalls(false);
 					yield break;
@@ -318,16 +317,18 @@ namespace Adorables.Ball
 				else
 				{
 					this.BAlleinGioco = 1;
-					ball = this.balls[i];
+					//ball = this.balls[i];
+					ball = this._balls_pool.GetObject();
 					ball.transform.position = startPosition + movement * 0.5f * 0f;
 					ball.gameObject.SetActive(true);
 					ball.Direction = movement.normalized;
 					ball.Speed = this.Speed;
+					ball.SetDeadMovePos(startPosition);
 					if (this.ballcolors != null)
 					{
 						ball.SetColor(this.ballcolors[i % this.ballcolors.Length]);
 					}
-					this.SetNRemainingBalls(this.balls.Count - 1 - i);
+					this.SetNRemainingBalls(this.ballcount - 1 - i);
 					yield return new WaitForSeconds(this.SpawnFrequency);
 					i++;
 				}
@@ -350,30 +351,17 @@ namespace Adorables.Ball
 			this.gameObject.SetActive(isShown);
 		}
 
-		private void SetTrajectoryPoints(Vector3 posStart, Vector2 direction)
-		{
-			float num = Mathf.Sqrt(direction.x * direction.x + direction.y * direction.y);
-			float num2 = 57.29578f * Mathf.Atan2(direction.y, direction.x);
-			float num3 = 0f;
-			num3 += 0.5f;
-			foreach (Transform current in this.trajectoryDots)
-			{
-				float num4 = num * num3 * Mathf.Cos(num2 * 0.0174532924f);
-				float num5 = num * num3 * Mathf.Sin(num2 * 0.0174532924f);
-				Vector3 position = new Vector3(posStart.x + num4, posStart.y + num5, 0f);
-				current.position = position;
-				current.gameObject.SetActive(true);
-				current.eulerAngles = new Vector3(0f, 0f, Mathf.Atan2(direction.y, direction.x));
-				num3 += 0.5f;
-			}
-		}
-
 		public void Update()
 		{
 			if (GameManager.Gonext == 0)
 			{
 				this.stopedBallsCount = 0;
 			}
+		}
+
+		public Vector3 GetBallPos()
+		{
+			return this.ball_pos.position;
 		}
 	}
 }

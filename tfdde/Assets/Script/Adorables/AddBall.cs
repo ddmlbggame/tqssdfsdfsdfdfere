@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Adorables.Ball
 {
-	public class AddBall : MonoBehaviour
+	public class AddBall : BasicCell
 	{
 		[SerializeField]
 		private Transform border;

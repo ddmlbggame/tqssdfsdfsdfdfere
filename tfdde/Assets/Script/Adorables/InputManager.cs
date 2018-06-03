@@ -25,7 +25,6 @@ namespace Adorables.Ball
 			else if (Input.GetMouseButton(0) && GameManager.Gonext == 1)
 			{
 				Vector3 b = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-				//Vector3 obj = this.startPosition - b;
 				if (InputManager.OnSwipe != null)
 				{
 					InputManager.OnSwipe(b);
@@ -34,7 +33,6 @@ namespace Adorables.Ball
 			else if (Input.GetMouseButtonUp(0) && GameManager.Gonext == 1)
 			{
 				Vector3 b2 = Camera.main.ScreenToWorldPoint(Input.mousePosition);
-				//Vector3 obj2 = this.startPosition - b2;
 				if (InputManager.OnSwipeEnded != null)
 				{
 					InputManager.OnSwipeEnded(b2);

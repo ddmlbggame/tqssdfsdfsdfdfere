@@ -2,5 +2,5 @@ using System;
 
 namespace Adorables.Ball
 {
-	public delegate void OnDestroyedEventHandler(IHitableByBall sender);
+	public delegate void OnDestroyedEventHandler(BasicCell sender);
 }

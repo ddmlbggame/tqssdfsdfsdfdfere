@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace Adorables.Ball
 {
-	public class Cell : MonoBehaviour, IHitableByBall
+	public class Cell : BasicCell ,IHitableByBall
 	{
 		[SerializeField]
 		private SpriteRenderer spriteRenderer;
@@ -18,7 +18,7 @@ namespace Adorables.Ball
 
 		private Vector3 startScale;
 
-		public int _count;
+		//public int _count;
 
 		private Color[] colors;
 

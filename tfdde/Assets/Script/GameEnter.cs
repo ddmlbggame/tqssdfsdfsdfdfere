@@ -23,7 +23,7 @@ public class GameEnter : MonoBehaviour {
 		}
 		if (GUI.Button(new Rect(0, 300, 200, 50), "effect"))
 		{
-			GameManager.ContinuaReward = 1;
+			game.OnReplayButtonClicked();
 		}
 		
 	}

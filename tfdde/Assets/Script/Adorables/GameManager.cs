@@ -13,10 +13,6 @@ namespace Adorables.Ball
 	{
 		public static GameManager Instance;
 
-		private static readonly string VerySimpleAdsURL = "http://u3d.as/oWD";
-
-		private static readonly string VerySimpleRateURL = "http://u3d.as/Dt2";
-
 		private AudioSource audio;
 
 		[SerializeField]
@@ -112,10 +108,7 @@ namespace Adorables.Ball
 		private Transform background;
 
 		[SerializeField]
-		private UIManager uiManager;
-
-		[SerializeField]
-		private Player player;
+		public Player player;
 
 		[SerializeField]
 		private AudioSource source;
@@ -131,7 +124,7 @@ namespace Adorables.Ball
 
 		private float maxCellProbability;
 
-		private List<Transform> cells;
+		private List<BasicCell> cells;
 
 		private Transform gridContainer;
 
@@ -147,51 +140,9 @@ namespace Adorables.Ball
 
 		public static int StatoRisoluzione;
 
-		//public Sprite SoundOn;
-
-		//public Sprite SoundOff;
-
-		//public GameObject btnimg;
-
-		//public GameObject btnimgPause;
-
-		public bool CanMute;
-
-		public static int ContinuaReward;
-
-		public static int Continuacount;
-
 		public static int Gonext;
 
-		public static int Econesso;
-
-		public static int Continuads;
-
-		public GameObject BtnContinua;
-
-		public GameObject BtnRateus;
-
-		public GameObject BtnX2coins;
-
-		public static int ManagerContinua = 1;
-
-		public int FasedelGiocoContinue;
-
-		public static int Fase;
-
-		public static int ShopOpen;
-
-		//public GameObject CanvasQuit;
-
 		private Vector3 MovingDirection = Vector3.up;
-
-		public GameObject BtnBomba;
-
-		//public GameObject Btngift;
-
-		public int AttivaBomba;
-
-		public int ObFatto;
 
 		public static float height;
 
@@ -203,7 +154,6 @@ namespace Adorables.Ball
 		}
 		private void Start()
 		{
-			this.CanMute = true;
 			this.aspect = this.cam.aspect;
 			int pixelHeight = this.cam.pixelHeight;
 			int pixelWidth = this.cam.pixelWidth;
@@ -267,29 +217,10 @@ namespace Adorables.Ball
 			{
 				throw new Exception("Cell Prefabs and Probabilities don't have the same length !");
 			}
-			//this.SubscribeToUIManager();
 			this.SetUpScreen();
 			this.SetUpGrid();
 			this.SetUpLevelBounds();
 			this.SetUpPlayer();
-		}
-
-		private void SubscribeToUIManager()
-		{
-			UIManager expr_06 = this.uiManager;
-			expr_06.PlayButtonClicked = (Action)Delegate.Combine(expr_06.PlayButtonClicked, new Action(this.OnPlayButtonClicked));
-			UIManager expr_2D = this.uiManager;
-			expr_2D.WatchAdButtonClicked = (Action)Delegate.Combine(expr_2D.WatchAdButtonClicked, new Action(this.OnWatchAdButtonClicked));
-			UIManager expr_54 = this.uiManager;
-			expr_54.RateButtonClicked = (Action)Delegate.Combine(expr_54.RateButtonClicked, new Action(this.OnRateButtonClicked));
-			UIManager expr_7B = this.uiManager;
-			expr_7B.MainMenuButtonClicked = (Action)Delegate.Combine(expr_7B.MainMenuButtonClicked, new Action(this.OnMainMenuButtonClicked));
-			UIManager expr_A2 = this.uiManager;
-			expr_A2.ReplayButtonClicked = (Action)Delegate.Combine(expr_A2.ReplayButtonClicked, new Action(this.OnReplayButtonClicked));
-			UIManager expr_C9 = this.uiManager;
-			expr_C9.ContinueButtonClicked = (Action)Delegate.Combine(expr_C9.ContinueButtonClicked, new Action(this.OnContinueButtonClicked));
-			UIManager expr_F0 = this.uiManager;
-			expr_F0.PauseButtonClicked = (Action)Delegate.Combine(expr_F0.PauseButtonClicked, new Action(this.Paused));
 		}
 
 		public void FixedUpdate()
@@ -306,157 +237,19 @@ namespace Adorables.Ball
 
 		public void OnPlayButtonClicked()
 		{
-			Sounds.PlayBtnSound = 1;
 			this.StartGame();
-			GameManager.Fase = 1;
 			GameManager.Gonext = 1;
 			this.NextTurn();
-			this.AttivaBomba = 1;
 		}
-
-		public void RestartGame()
+		public void OnReplayButtonClicked()
 		{
-			if (PlayerPrefs.HasKey("RemoveAds"))
-			{
-				this.AttivaBomba = 1;
-				GameManager.ManagerContinua = 1;
-				PlayerPrefs.SetInt("continua", GameManager.ManagerContinua);
-				PlayerPrefs.Save();
-				Sounds.PlayBtnSound = 1;
-				this.uiManager.DisplayContinua(false);
-				this.uiManager.DisplayTitlecard(false);
-				this.uiManager.DisplayHUD(true);
-				this.DisplayPlayer(true);
-				Time.timeScale = 1f;
-				this.player.StartTurn();
-				this.Reset();
-				Utils.Currentscore = 0;
-				this.currentMinCellCount = this.startMinCellCount;
-				this.currentMaxCellCount = this.startMinCellCount;
-				this.NextTurn();
-				this.BtnRateus.SetActive(true);
-				this.BtnX2coins.SetActive(true);
-				Player.Azzerapalline = 1;
-				this.player.SetUpBalls();
-			}
-			else
-			{
-				this.AttivaBomba = 1;
-				GameManager.ManagerContinua = 1;
-				PlayerPrefs.SetInt("continua", GameManager.ManagerContinua);
-				PlayerPrefs.Save();
-				Sounds.PlayBtnSound = 1;
-				this.uiManager.DisplayContinua(false);
-				this.uiManager.DisplayTitlecard(false);
-				this.uiManager.DisplayHUD(true);
-				this.DisplayPlayer(true);
-				Time.timeScale = 1f;
-				this.player.StartTurn();
-				this.Reset();
-				Utils.Currentscore = 0;
-				this.currentMinCellCount = this.startMinCellCount;
-				this.currentMaxCellCount = this.startMinCellCount;
-				this.NextTurn();
-				this.BtnRateus.SetActive(true);
-				this.BtnX2coins.SetActive(true);
-				Player.Azzerapalline = 1;
-				this.player.SetUpBalls();
-			}
-		}
-
-		public void MuteAudio()
-		{
-			if (this.CanMute)
-			{
-				AudioListener.pause = true;
-				this.CanMute = false;
-				//this.btnimg.GetComponent<Image>().sprite = this.SoundOff;
-				//this.btnimgPause.GetComponent<Image>().sprite = this.SoundOff;
-			}
-			else
-			{
-				AudioListener.pause = false;
-				this.CanMute = true;
-				//this.btnimg.GetComponent<Image>().sprite = this.SoundOn;
-				//this.btnimgPause.GetComponent<Image>().sprite = this.SoundOn;
-			}
-		}
-
-		private void OnWatchAdButtonClicked()
-		{
-		}
-
-		private void OnRateButtonClicked()
-		{
-		}
-
-		private void OnShopButtonClicked()
-		{
-		}
-
-		private void OnReplayButtonClicked()
-		{
-			this.uiManager.DisplayGameOver(false);
-			this.StartGame();
-			Time.timeScale = 1f;
-		}
-
-		private void Paused()
-		{
-			Sounds.PlayBtnSound = 1;
-			this.uiManager.DisplayPause(true);
-			this.uiManager.DisplayHUD(false);
-			Time.timeScale = 0f;
-		}
-
-		private void ContinuaRewarded()
-		{
-			GameManager.Continuacount++;
-			PlayerPrefs.SetInt("cont", GameManager.Continuacount);
-			PlayerPrefs.Save();
-			Sounds.PlayBtnSound = 1;
-			//this.uiManager.DisplayContinua(false);
-			//this.uiManager.DisplayTitlecard(false);
-			this.DisplayPlayer(true);
-			Time.timeScale = 1f;
-			BombShoot.RandomEffect = 5;
-			this.player.StartTurn();
-			GameManager.ManagerContinua = 2;
-			PlayerPrefs.SetInt("continua", GameManager.ManagerContinua);
-			PlayerPrefs.Save();
-		}
-
-		private void RewardedVideoAdShowFailed()
-		{
-			Sounds.PlayBtnSound = 1;
-			this.uiManager.DisplayContinua(true);
-			this.uiManager.DisplayTitlecard(false);
-			Time.timeScale = 0f;
-			GameManager.ManagerContinua = 2;
-		}
-
-		private void OnContinueButtonClicked()
-		{
-	
-		}
-
-		private void OnMainMenuButtonClicked()
-		{
-			Sounds.PlayBtnSound = 1;
-			Utils.NextTurn = 2;
-			this.uiManager.DisplayGameOver(false);
-			this.uiManager.DisplayTitlecard(true);
 			this.Reset();
-			this.player.SetUpBalls();
-			GameManager.Fase = 0;
-			GameManager.Gonext = 0;
-			this.DisplayPlayer(false);
-			this.BtnRateus.SetActive(true);
-			this.BtnX2coins.SetActive(true);
+			this.StartGame();
 		}
 
 		public void Reset()
 		{
+			this.ballToAddCount = 0;
 			for (int i = this.cells.Count - 1; i > -1; i--)
 			{
 				UnityEngine.Object.Destroy(this.cells[i].gameObject);
@@ -477,7 +270,7 @@ namespace Adorables.Ball
 			this.stepX = Mathf.Min(this.screenRect.width, this.screenRect.height) / (float)(this.numberOfColumn + 1);
 			float num = this.stepX / 2f;
 			this.gridContainer = new GameObject("Grid").transform;
-			this.cells = new List<Transform>();
+			this.cells = new List<BasicCell>();
 			for (int i = 0; i < this.brickProbabilities.Length; i++)
 			{
 				this.maxCellProbability += this.brickProbabilities[i];
@@ -504,20 +297,16 @@ namespace Adorables.Ball
 						UnityEngine.Debug.Log("CreatePowerUp");
 						this.CreatePowerUp(i, 0);
 					}
-					//else
-					//{
-					//	this.CreateBrick(i, 0);
-					//}
 				}
 			}
 		}
 
 		private void MoveGrid()
 		{
-			foreach (Transform current in this.cells)
+			foreach (BasicCell current in this.cells)
 			{
-				Vector3 endposition = current.position - Vector3.up * this.stepX;
-				current.DOMove(endposition, 0.5f);
+				Vector3 endposition = current.transform.position - Vector3.up * this.stepX;
+				current.transform.DOMove(endposition, 0.5f);
 			}
 		}
 
@@ -525,34 +314,6 @@ namespace Adorables.Ball
 		{
 			base.StartCoroutine(this.NextTurnCoroutine());
 			UnityEngine.Debug.Log("next turn");
-		}
-
-		public void InternetStatus()
-		{
-			if (Application.internetReachability != NetworkReachability.NotReachable)
-			{
-				this.Continuareilgioco();
-				if (GameManager.ManagerContinua == 1)
-				{
-					this.BtnContinua.SetActive(true);
-					this.BtnContinua.GetComponent<Button>().enabled = true;
-					this.BtnRateus.SetActive(false);
-					this.BtnX2coins.SetActive(false);
-					GameManager.Econesso = 1;
-				}
-			}
-			else
-			{
-				this.Continuareilgioco();
-				if (GameManager.ManagerContinua == 1)
-				{
-					this.BtnContinua.SetActive(true);
-					this.BtnContinua.GetComponent<Button>().enabled = false;
-					this.BtnRateus.SetActive(false);
-					this.BtnX2coins.SetActive(false);
-					GameManager.Econesso = 0;
-				}
-			}
 		}
 
 		[DebuggerHidden]
@@ -571,73 +332,20 @@ namespace Adorables.Ball
 				this.ballToAddCount = 0;
 				this.source.PlayOneShot(this.gameOver);
 				yield return new WaitForSeconds(0.5f);
-				Time.timeScale = 0f;
 				UnityEngine.Debug.Log("gameover");
 			}
 			else
 			{
 				yield return new WaitForSeconds(0.5f);
-				for (int i = 0; i < this.ballToAddCount; i++)
-					{
-					this.player.AddBall();
-				}
+				this.player.AddBall(this.ballToAddCount);
 				this.ballToAddCount = 0;
 				this.player.StartTurn();
 			}
 		}
 
-		//public void RateButtonClick()
-		//{
-		//	Application.OpenURL("https://play.google.com/store/apps/details?id=com.ItaIndieStudio.BubbleShotBallz");
-		//}
-
-		private void Continuareilgioco()
-		{
-			PlayerPrefs.SetInt("continua", GameManager.ManagerContinua);
-			PlayerPrefs.Save();
-			GameManager.ManagerContinua = PlayerPrefs.GetInt("continua");
-			if (GameManager.ManagerContinua == 2)
-			{
-				int num = UnityEngine.Random.Range(1, 3);
-				if (num == 1)
-				{
-					this.BtnContinua.SetActive(false);
-					this.BtnRateus.SetActive(true);
-					this.BtnX2coins.SetActive(false);
-				}
-				else if (num == 2)
-				{
-					this.BtnContinua.SetActive(false);
-					this.BtnRateus.SetActive(false);
-					this.BtnX2coins.SetActive(true);
-				}
-			}
-			UnityEngine.Debug.Log("Panello continua e apparso");
-			this.ShowAds();
-			for (int i = this.cells.Count - 1; i > -1; i--)
-			{
-			}
-			this.DisplayPlayer(false);
-			this.uiManager.DisplayHUD(false);
-			this.uiManager.DisplayContinua(true);
-		}
-
-		private void GameOver()
-		{
-			this.ShowAds();
-			for (int i = this.cells.Count - 1; i > -1; i--)
-			{
-				UnityEngine.Object.Destroy(this.cells[i].gameObject);
-				this.cells.RemoveAt(i);
-			}
-			this.DisplayPlayer(false);
-			this.uiManager.DisplayHUD(false);
-			this.uiManager.DisplayGameOver(true);
-		}
-
 		private void DisplayPlayer(bool isShown)
 		{
-			this.player.gameObject.SetActive(isShown);
+			this.player.gameObject.SetActive(true);
 		}
 
 		private void UpgradeDifficulty()
@@ -662,7 +370,7 @@ namespace Adorables.Ball
 			{
 				if (!this.cells[i].CompareTag(Constants.PICKABLE_TAG))
 				{
-					Vector3 position = this.cells[i].position;
+					Vector3 position = this.cells[i].transform.position;
 					int layerMask = -1537;
 					RaycastHit2D hit = Physics2D.Raycast(position, -Vector3.up, this.stepX * 2.25f, layerMask);
 					return hit && hit.collider.CompareTag(Constants.FLOOR_TAG);
@@ -683,42 +391,42 @@ namespace Adorables.Ball
 		{
 			float value = UnityEngine.Random.value;
 			this.SpawnChance = value;
-			Transform transform;
+			BasicCell cell;
 			if (value < this.addBallProbability)
 			{
 				AddBall addBall = UnityEngine.Object.Instantiate<AddBall>(this.addBallPrefab);
 				AddBall expr_26 = addBall;
 				expr_26.OnCollision = (Action<AddBall>)Delegate.Combine(expr_26.OnCollision, new Action<AddBall>(this.AddBall_OnCollision));
-				transform = addBall.transform;
+				cell = addBall;
 			}
 			else if (value < this.addCoinProbability)
 			{
 				AddBomb addBomb = UnityEngine.Object.Instantiate<AddBomb>(this.addBombPrefab);
 				AddBomb expr_6C = addBomb;
 				expr_6C.OnCollision = (Action<AddBomb>)Delegate.Combine(expr_6C.OnCollision, new Action<AddBomb>(this.AddBomb_OnCollision));
-				transform = addBomb.transform;
+				cell = addBomb;
 			}
 			else
 			{
 				AddCoin addCoin = UnityEngine.Object.Instantiate<AddCoin>(this.addCoinPrefab);
 				AddCoin expr_A8 = addCoin;
 				expr_A8.OnCollision = (Action<AddCoin>)Delegate.Combine(expr_A8.OnCollision, new Action<AddCoin>(this.AddCoin_OnCollision));
-				transform = addCoin.transform;
+				cell = addCoin;
 			}
-			transform.SetParent(this.gridContainer);
-			transform.localPosition = this.GetPositionFromModel(x, y);
-			this.cells.Add(transform);
+			cell.transform.SetParent(this.gridContainer);
+			cell.transform.localPosition = this.GetPositionFromModel(x, y);
+			this.cells.Add(cell);
 		}
 
 		private void AddBall_OnCollision(AddBall sender)
 		{
-			this.cells.Remove(sender.transform);
+			this.cells.Remove(sender);
 			this.ballToAddCount++;
 		}
 
 		private void AddCoin_OnCollision(AddCoin sender)
 		{
-			this.cells.Remove(sender.transform);
+			this.cells.Remove(sender);
 			Utils.Moneta++;
 			PlayerPrefs.SetInt("moneta", Utils.Moneta);
 			PlayerPrefs.Save();
@@ -726,7 +434,7 @@ namespace Adorables.Ball
 
 		private void AddBomb_OnCollision(AddBomb sender)
 		{
-			this.cells.Remove(sender.transform);
+			this.cells.Remove(sender);
 			UnityEngine.Debug.Log("missili lanciati");
 		}
 
@@ -750,7 +458,7 @@ namespace Adorables.Ball
 			cell.transform.localScale *= this.stepX;
 			cell.transform.localPosition = this.GetPositionFromModel(x, y);
 			cell.OnDestroyedByBall += new OnDestroyedEventHandler(this.Cell_OnDestroyedByBall);
-			this.cells.Add(cell.transform);
+			this.cells.Add(cell);
 			int count = UnityEngine.Random.Range(this.currentMinCellCount, this.currentMaxCellCount + 1);
 			cell._count = count;
 			cell.SetCount(count);
@@ -758,22 +466,19 @@ namespace Adorables.Ball
 			cell.SetStartScale(cell.transform.localScale);
 		}
 
-		private void Cell_OnDestroyedByBall(IHitableByBall sender)
+		private void Cell_OnDestroyedByBall(BasicCell sender)
 		{
-			MonoBehaviour monoBehaviour = (MonoBehaviour)sender;
-			this.cells.Remove(monoBehaviour.transform);
+			this.cells.Remove(sender);
 		}
 
-		private void Cell_OnDestroyedByBomb(IHitableByBall sender)
+		private void Cell_OnDestroyedByBomb(BasicCell sender)
 		{
-			MonoBehaviour monoBehaviour = (MonoBehaviour)sender;
-			this.cells.Remove(monoBehaviour.transform);
+			this.cells.Remove(sender);
 		}
 
-		private void Cell_OnDestroyedByBomba(IHitableByBall sender)
+		private void Cell_OnDestroyedByBomba(BasicCell sender)
 		{
-			MonoBehaviour monoBehaviour = (MonoBehaviour)sender;
-			this.cells.Remove(monoBehaviour.transform);
+			this.cells.Remove(sender);
 		}
 
 		private Vector3 GetPositionFromModel(int x, int y)
@@ -789,7 +494,7 @@ namespace Adorables.Ball
 			this.player.SpawnFrequency = this.spawnFrequency;
 			this.player.BallScale = this.stepX;
 			this.player.ScreenRect = this.screenRect;
-			this.player.SetUpTrajectoryDots();
+			//this.player.SetUpTrajectoryDots();
 			Player expr_76 = this.player;
 			expr_76.TurnEnded = (Action)Delegate.Combine(expr_76.TurnEnded, new Action(this.OnTurnEnded));
 		}
@@ -804,98 +509,6 @@ namespace Adorables.Ball
 		private void SetUpScreen()
 		{
 			this.screenRect = CameraTools.GetScreenRect();
-		}
-
-		public void Achievement()
-		{
-			Sounds.PlayBtnSound = 1;
-		}
-
-		public void Leaderboard()
-		{
-			Sounds.PlayBtnSound = 1;
-		}
-
-		public void Tenk()
-		{
-			Utils.Moneta += 20000;
-			PlayerPrefs.SetInt("moneta", Utils.Moneta);
-			PlayerPrefs.Save();
-		}
-
-		public void CallBombAtomic()
-		{
-			this.BtnBomba.SetActive(false);
-		}
-
-		public void CallRandomBomb()
-		{
-			//this.Btngift.SetActive(false);
-			//base.StartCoroutine(this.attivaBtn());
-		}
-
-		[DebuggerHidden]
-		private IEnumerator attivaBtn()
-		{
-			yield return new WaitForSeconds(30f);
-			//this.Btngift.SetActive(true);
-		}
-
-
-		public void Update()
-		{
-			if (GameManager.ContinuaReward == 1)
-			{
-				GameManager.ContinuaReward = 0;
-				this.ContinuaRewarded();
-			}
-			if (GameManager.ContinuaReward == 2)
-			{
-				GameManager.ContinuaReward = 0;
-				this.RewardedVideoAdShowFailed();
-			}
-			GameManager.Continuacount = PlayerPrefs.GetInt("cont");
-			if (GameManager.Continuacount >= 20 && this.ObFatto == 0)
-			{
-				this.ObFatto = 1;
-				PlayerPrefs.SetInt("obFatto", this.ObFatto);
-				PlayerPrefs.Save();
-				this.ObFatto = PlayerPrefs.GetInt("obFatto");
-			}
-			if (Utils.Currentscore > 25 && this.AttivaBomba == 1)
-			{
-				this.AttivaBomba = 0;
-				this.BtnBomba.SetActive(true);
-			}
-			else if (Utils.Currentscore < 25 && this.AttivaBomba == 1)
-			{
-				this.BtnBomba.SetActive(false);
-			}
-			this.BtnBomba.transform.Translate(this.MovingDirection * Time.smoothDeltaTime);
-			if (this.BtnBomba.transform.position.y > 1.5f)
-			{
-				this.MovingDirection = Vector3.down;
-			}
-			else if (this.BtnBomba.transform.position.y < -1.5f)
-			{
-				this.MovingDirection = Vector3.up;
-			}
-			this.FasedelGiocoContinue = GameManager.ManagerContinua;
-			if (Input.GetKeyDown(KeyCode.Escape) && GameManager.Fase == 1)
-			{
-				this.Paused();
-				UnityEngine.Debug.Log("pause");
-			}
-			else if (Input.GetKeyDown(KeyCode.Escape) && GameManager.Fase == 0)
-			{
-				Application.Quit();
-			}
-			this.player.Speed = this.speed;
-			if (GameManager.Continuads == 1)
-			{
-				GameManager.Continuads = 0;
-				UnityEngine.Debug.Log("Checked Update");
-			}
 		}
 
 		private void SetUpLevelBounds()
@@ -941,32 +554,20 @@ namespace Adorables.Ball
 				return true;
 			}
 
-			if(pos.x< this.leftWall.transform.position.x)
+			if(pos.x< this.leftWall.transform.position.x-2)
 			{
 				return true;
 			}
 
-			if (pos.x > this.rightWall.transform.position.x)
+			if (pos.x > this.rightWall.transform.position.x+2)
 			{
 				return true;
 			}
 			return false;
 		}
-
-		public void ShowAds()
+		public Vector3 GetPlayerBallPos()
 		{
-			int num = PlayerPrefs.GetInt("GAMEOVER_COUNT", 0);
-			num++;
-			if (num >= this.numberOfPlayToShowInterstitial)
-			{
-				UnityEngine.Debug.LogWarning("To show ads, please have a look at Very Simple Ad on the Asset Store, or go to this link: " + GameManager.VerySimpleAdsURL);
-				PlayerPrefs.SetInt("GAMEOVER_COUNT", 0);
-			}
-			else
-			{
-				PlayerPrefs.SetInt("GAMEOVER_COUNT", num);
-			}
-			PlayerPrefs.Save();
+			return this.player.GetBallPos();
 		}
 	}
 }

@@ -38,10 +38,10 @@ GameObject:
   - component: {fileID: 212404683740478998}
   - component: {fileID: 114143044506531850}
   - component: {fileID: 50429726491034276}
+  - component: {fileID: 58092266364737860}
   - component: {fileID: 96821109057627362}
-  - component: {fileID: 58365801373379384}
   m_Layer: 0
-  m_Name: Ball3
+  m_Name: Ball4
   m_TagString: Ball
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -94,7 +94,7 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
---- !u!58 &58365801373379384
+--- !u!58 &58092266364737860
 CircleCollider2D:
   m_ObjectHideFlags: 1
   m_PrefabParentObject: {fileID: 0}
@@ -108,7 +108,7 @@ CircleCollider2D:
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
-  m_Radius: 0.14
+  m_Radius: 0.05
 --- !u!82 &82513737926262078
 AudioSource:
   m_ObjectHideFlags: 1
@@ -211,7 +211,7 @@ TrailRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 100100000}
   m_GameObject: {fileID: 1581409314968978}
-  m_Enabled: 0
+  m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -324,7 +324,6 @@ MonoBehaviour:
   minspeed: 7
   startspeed: 3
   ballsprite: {fileID: 212404683740478998}
-  ball_prefab: {fileID: 114143044506531850}
 --- !u!212 &212404683740478998
 SpriteRenderer:
   m_ObjectHideFlags: 1

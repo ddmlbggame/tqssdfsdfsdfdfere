@@ -68,6 +68,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a5642e548e5805c4daa31a36287a9956, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _count: 1
+  celltype: 1
   border: {fileID: 4172566851430682}
 --- !u!212 &212624761416437342
 SpriteRenderer:

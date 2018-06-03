@@ -68,6 +68,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 19b60e57e6de3c04db86e6fd82e281f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _count: 1
+  celltype: 0
 --- !u!212 &212169602724350554
 SpriteRenderer:
   m_ObjectHideFlags: 1

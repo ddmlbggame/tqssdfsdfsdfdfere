@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Adorables.Ball
 {
-	public class AddBomb : MonoBehaviour
+	public class AddBomb : BasicCell
 	{
 		public Action<AddBomb> OnCollision;
 

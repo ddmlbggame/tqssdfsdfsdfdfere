@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace Adorables.Ball
 {
-	public class AddCoin : MonoBehaviour
+	public class AddCoin : BasicCell
 	{
 		public Action<AddCoin> OnCollision;
 
